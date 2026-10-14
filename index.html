@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shrift — рукописный конспект</title>
+    <!-- Подключаем шрифты Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- CSS Стили -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="dark-theme">
+    <!-- Pyodide Loading Overlay -->
+    <div id="pyodide-loading" style="position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(10,10,20,0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 16px; box-sizing: border-box; text-align: center;">
+        <div class="spinner"></div>
+        <h2 style="margin-top: 20px;">Запускаем Shrift…</h2>
+        <p id="pyodide-status" style="opacity: 0.7;">Подготовка…</p>
+        <div class="load-progress" aria-hidden="true"><div id="load-progress-bar" class="load-progress-bar"></div></div>
+        <div id="mirror-hint" class="mirror-hint" style="display:none">
+            Долго грузится?
+            <a id="mirror-link" href="#" rel="noopener">Откройте зеркало сайта</a>
+            <span id="mirror-novpn">или проверьте интернет/VPN</span>
+        </div>
+        <button id="btn-offline-retry" class="btn btn-primary" style="display:none; margin-top:18px" >Попробовать снова</button>
+    </div>
+    <!-- Движок грузится в фоне: маленькая плашка вместо экрана ожидания -->
+    <div id="engine-pill" class="engine-pill" role="status">
+        <span class="engine-pill-dot"></span>
+        <span id="engine-pill-text">Готовим движок…</span>
+        <a id="engine-pill-mirror" href="#" rel="noopener" style="display:none">Долго? Зеркало</a>
+    </div>
+    <!-- Фоновые неоновые сферы для Glassmorphism эффекта -->
+    <div class="glow-bg">
+        <div class="blob blob-purple"></div>
+        <div class="blob blob-cyan"></div>
+        <div class="blob blob-blue"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Шапка приложения -->
+        <header class="app-header">
+            <div class="logo">
+                <span class="icon">✍️</span>
+                <div class="logo-text">
+                    <h1>Shrift</h1>
+                    <span class="subtitle">генерация рукописного текста</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="preset-selector">
+                    <label for="preset-select">Пресет:</label>
+                    <select id="preset-select">
+                        <option value="" disabled selected>Выберите пресет...</option>
+                    </select>
+                </div>
+                <button id="btn-save-preset" class="btn btn-secondary">💾 Сохранить пресет</button>
+                <button id="btn-export-pdf" class="btn btn-primary btn-glow">🚀 Экспорт в PDF</button>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="app-main">
+            <!-- Левая панель: настройки -->
+            <section class="settings-sidebar glass-panel">
+                <!-- Вкладки управления -->
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-tab="tab-files">📁 Файлы</button>
+                    <button class="tab-btn" data-tab="tab-page">📄 Разметка</button>
+                    <button class="tab-btn" data-tab="tab-style">✍️ Стиль</button>
+                    <button class="tab-btn" data-tab="tab-effects">🌀 Искажения</button>
+                </div>
+
+                <div class="tabs-content">
+                    <!-- ВКЛАДКА 1: ФАЙЛЫ И СТАТУС -->
+                    <div id="tab-files" class="tab-pane active">
+                        <h3 class="tab-title">Файлы и состояние</h3>
+                        
+                        <!-- Статусы системы -->
+                        <div class="status-card">
+                            <h4>Статус загрузки:</h4>
+                            <div class="status-item" id="status-doc">
+                                <span class="status-indicator red"></span>
+                                <span class="status-text">Документ не загружен</span>
+                            </div>
+                            <div class="status-item" id="status-font">
+                                <span class="status-indicator red"></span>
+                                <span class="status-text">Шрифт не загружен</span>
+                            </div>
+                            <div class="status-item" id="status-variants">
+                                <span class="status-indicator red"></span>
+                                <span class="status-text">Вариации не сгенерированы</span>
+                            </div>
+                        </div>
+
+                        <!-- Загрузчики файлов -->
+                        <div class="upload-section">
+                            <label class="upload-box" id="doc-upload-box">
+                                <input type="file" id="input-doc" accept=".docx,.tex,.latex,.md,.markdown,.txt" style="display:none">
+                                <span class="upload-icon">📄</span>
+                                <span class="upload-title">Загрузить документ</span>
+                                <span class="upload-desc">DOCX, LaTeX, MD, TXT</span>
+                            </label>
+                            
+                            <label class="upload-box" id="font-upload-box">
+                                <input type="file" id="input-font" accept=".ttf" style="display:none">
+                                <span class="upload-icon">🔤</span>
+                                <span class="upload-title">Загрузить шрифт</span>
+                                <span class="upload-desc">Файл шрифта TTF</span>
+                            </label>
+                        </div>
+
+                        <!-- Принесённый шрифт запоминается в браузере пользователя -->
+                        <div id="saved-font-bar" class="saved-font-bar" style="display:none">
+                            <span>Ваш шрифт: <b id="saved-font-name"></b> (сохранён в этом браузере)</span>
+                            <button id="btn-font-reset" class="link-btn">Вернуть стандартный</button>
+                        </div>
+
+                        <!-- Рекомендуемые шрифты: мы их не храним и не раздаём, пользователь приносит файл сам -->
+                        <details class="font-recs">
+                            <summary>Рекомендуемые шрифты</summary>
+                            <ul>
+                                <li><b>Eskal</b> (студия Font4You). Лицензию на него получайте у автора.</li>
+                                <li><a href="https://fonts.google.com/specimen/Caveat" target="_blank" rel="noopener">Caveat</a>, бесплатный</li>
+                                <li><a href="https://fonts.google.com/specimen/Bad+Script" target="_blank" rel="noopener">Bad Script</a>, бесплатный</li>
+                                <li><a href="https://fonts.google.com/specimen/Marck+Script" target="_blank" rel="noopener">Marck Script</a>, бесплатный</li>
+                                <li><a href="https://fonts.google.com/specimen/Neucha" target="_blank" rel="noopener">Neucha</a>, бесплатный</li>
+                            </ul>
+                            <p class="font-recs-note">Скачайте файл .ttf у автора и загрузите кнопкой «Загрузить шрифт». Shrift не хранит и не распространяет эти шрифты: файл остаётся только у вас в браузере, права на шрифт принадлежат его автору.</p>
+                        </details>
+
+                        <!-- Свой почерк: бланк -> фото -> шрифт -->
+                        <div class="settings-group mt-3" id="handwriting-section">
+                            <h4 class="group-title">Шрифт из вашего почерка</h4>
+                            <ol class="hw-steps">
+                                <li><a href="templates/shrift_font_template.pdf" download="Shrift_бланк_почерка.pdf">Скачайте бланк (PDF, 2 листа)</a> и распечатайте.</li>
+                                <li>Заполните ручкой: по одному символу в клетке, на пунктирной линии.</li>
+                                <li>Сфотографируйте оба листа сверху, все 4 чёрные метки в кадре.</li>
+                            </ol>
+                            <label class="upload-box" id="photo-upload-box">
+                                <input type="file" id="input-photos" accept="image/*" multiple style="display:none">
+                                <span class="upload-icon">📷</span>
+                                <span class="upload-title">Загрузить фото бланка</span>
+                                <span class="upload-desc">Можно оба листа сразу (JPG, PNG, фото с телефона)</span>
+                            </label>
+                            <div id="hw-result" class="hw-result" style="display:none">
+                                <div id="hw-report" class="hw-report"></div>
+                                <img id="hw-preview" alt="Как выглядит ваш шрифт">
+                                <button id="btn-hw-download" class="btn btn-secondary w-100 mt-2">⬇️ Скачать шрифт (TTF)</button>
+                            </div>
+                        </div>
+
+                        <!-- Управление генерацией вариаций шрифтов -->
+                        <div class="settings-group mt-3">
+                            <h4 class="group-title">Параметры вариативности</h4>
+                            <div class="slider-control">
+                                <div class="slider-header">
+                                    <span>Количество вариантов</span>
+                                    <span class="slider-value" id="val-variant_count">30</span>
+                                </div>
+                                <input type="range" id="input-variant_count" min="10" max="100" step="5" value="30" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Сила искажения точек (джиттер)</span>
+                                    <span class="slider-value" id="val-key_shift">22</span>
+                                </div>
+                                <input type="range" id="input-key_shift" min="0" max="50" step="1" value="22" class="neon-slider">
+                            </div>
+                            <button id="btn-generate-fonts" class="btn btn-secondary w-100 mt-2">🔨 Перегенерировать шрифты</button>
+                        </div>
+                    </div>
+
+                    <!-- ВКЛАДКА 2: РАЗМЕТКА СТРАНИЦЫ -->
+                    <div id="tab-page" class="tab-pane">
+                        <h3 class="tab-title">Параметры страницы</h3>
+
+                        <div class="settings-group">
+                            <h4 class="group-title">Вид и цвета</h4>
+                            <div class="control-row">
+                                <div class="field-control">
+                                    <label for="input-paper_type">Тип разметки</label>
+                                    <select id="input-paper_type" class="neon-select">
+                                        <option value="grid">В клеточку</option>
+                                        <option value="ruled">В линейку</option>
+                                        <option value="blank">Чистый лист</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="control-row mt-2">
+                                <div class="color-control">
+                                    <label for="input-paper_color">Цвет бумаги</label>
+                                    <input type="color" id="input-paper_color" value="#ffffff">
+                                </div>
+                                <div class="color-control">
+                                    <label for="input-pen_color">Цвет чернил</label>
+                                    <input type="color" id="input-pen_color" value="#0000ff">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h4 class="group-title font-small">Размеры листа (300 DPI)</h4>
+                            <div class="control-row double-input">
+                                <div class="field-control">
+                                    <label for="input-page_w">Ширина (px)</label>
+                                    <input type="number" id="input-page_w" value="2480" class="neon-input">
+                                </div>
+                                <div class="field-control">
+                                    <label for="input-page_h">Высота (px)</label>
+                                    <input type="number" id="input-page_h" value="3508" class="neon-input">
+                                </div>
+                            </div>
+                            <div class="preset-links">
+                                <button type="button" class="link-btn" onclick="setPagePreset(2480, 3508)">A4 (2480x3508)</button>
+                                <button type="button" class="link-btn" onclick="setPagePreset(1748, 2480)">A5 (1748x2480)</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h4 class="group-title">Сетка и поля</h4>
+                            <div class="control-row double-input">
+                                <div class="field-control">
+                                    <label for="input-grid_color">Цвет сетки</label>
+                                    <input type="color" id="input-grid_color" value="#a0d2eb" class="neon-input" style="padding:0; height: 38px;">
+                                </div>
+                                <div class="field-control">
+                                    <label for="input-grid_thickness">Толщина (px)</label>
+                                    <input type="number" id="input-grid_thickness" value="2" min="1" max="10" class="neon-input">
+                                </div>
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Размер клеточки (px)</span>
+                                    <span class="slider-value" id="val-grid_size">60</span>
+                                </div>
+                                <input type="range" id="input-grid_size" min="30" max="100" step="2" value="60" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Базовый отступ (px)</span>
+                                    <span class="slider-value" id="val-base_margin">15</span>
+                                </div>
+                                <input type="range" id="input-base_margin" min="0" max="100" step="5" value="15" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Правый отступ (px)</span>
+                                    <span class="slider-value" id="val-right_padding">110</span>
+                                </div>
+                                <input type="range" id="input-right_padding" min="20" max="300" step="5" value="110" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Ширина корешка (в клетках)</span>
+                                    <span class="slider-value" id="val-spine_cells">3</span>
+                                </div>
+                                <input type="range" id="input-spine_cells" min="0" max="10" step="1" value="3" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Интервал между строками (в клетках)</span>
+                                    <span class="slider-value" id="val-line_spacing_cells">2</span>
+                                </div>
+                                <input type="range" id="input-line_spacing_cells" min="1" max="4" step="1" value="2" class="neon-slider">
+                                <div id="line-spacing-hint" class="field-hint" style="display:none">Буквы крупнее строки и будут наезжать друг на друга — уменьшите размер шрифта.</div>
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Сдвиг текста по Y (px)</span>
+                                    <span class="slider-value" id="val-global_y_shift">0</span>
+                                </div>
+                                <input type="range" id="input-global_y_shift" min="-100" max="100" step="2" value="0" class="neon-slider">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ВКЛАДКА 3: ШРИФТ И СТИЛЬ ПИСЬМА -->
+                    <div id="tab-style" class="tab-pane">
+                        <h3 class="tab-title">Стиль написания</h3>
+                        
+                        <div class="settings-group">
+                            <h4 class="group-title">Базовые параметры</h4>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Размер шрифта (pt)</span>
+                                    <span class="slider-value" id="val-font_size">80</span>
+                                </div>
+                                <input type="range" id="input-font_size" min="30" max="150" step="2" value="80" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Жирность (толщина обводки)</span>
+                                    <span class="slider-value" id="val-bold_stroke_width">2</span>
+                                </div>
+                                <input type="range" id="input-bold_stroke_width" min="0" max="5" step="1" value="2" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Наклон курсива</span>
+                                    <span class="slider-value" id="val-italic_shear_factor">-0.15</span>
+                                </div>
+                                <input type="range" id="input-italic_shear_factor" min="-0.4" max="0.1" step="0.01" value="-0.15" class="neon-slider">
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h4 class="group-title">Математические индексы</h4>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Размер индексов (доля)</span>
+                                    <span class="slider-value" id="val-index_scale">0.6</span>
+                                </div>
+                                <input type="range" id="input-index_scale" min="0.4" max="0.9" step="0.05" value="0.6" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Сдвиг подстрочного индекса</span>
+                                    <span class="slider-value" id="val-subscript_offset_ratio">0.35</span>
+                                </div>
+                                <input type="range" id="input-subscript_offset_ratio" min="0.1" max="0.8" step="0.05" value="0.35" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Сдвиг надстрочного индекса</span>
+                                    <span class="slider-value" id="val-superscript_offset_ratio">0.5</span>
+                                </div>
+                                <input type="range" id="input-superscript_offset_ratio" min="0.1" max="0.8" step="0.05" value="0.5" class="neon-slider">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ВКЛАДКА 4: ИСКАЖЕНИЯ И ЭФФЕКТЫ -->
+                    <div id="tab-effects" class="tab-pane">
+                        <h3 class="tab-title">Имитация ручного письма</h3>
+                        
+                        <div class="settings-group">
+                            <h4 class="group-title">Неровность и дрожание</h4>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Дрожание начала строки (px)</span>
+                                    <span class="slider-value" id="val-line_jit">60</span>
+                                </div>
+                                <input type="range" id="input-line_jit" min="0" max="150" step="5" value="60" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Мин. сдвиг слова по Y</span>
+                                    <span class="slider-value" id="val-word_vert_min">-4</span>
+                                </div>
+                                <input type="range" id="input-word_vert_min" min="-15" max="0" step="1" value="-4" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Макс. сдвиг слова по Y</span>
+                                    <span class="slider-value" id="val-word_vert_max">2</span>
+                                </div>
+                                <input type="range" id="input-word_vert_max" min="0" max="15" step="1" value="2" class="neon-slider">
+                            </div>
+                        </div>
+
+                        <div class="settings-group">
+                            <h4 class="group-title">Искривление слов (волны)</h4>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Амплитуда изгиба дуги (px)</span>
+                                    <span class="slider-value" id="val-max_word_arc">12</span>
+                                </div>
+                                <input type="range" id="input-max_word_arc" min="0" max="30" step="1" value="12" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Амплитуда экспоненты (px)</span>
+                                    <span class="slider-value" id="val-max_word_exp">9.6</span>
+                                </div>
+                                <input type="range" id="input-max_word_exp" min="0" max="30" step="0.5" value="9.6" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Амплитуда обратной экспоненты (px)</span>
+                                    <span class="slider-value" id="val-max_word_inv_exp">9.6</span>
+                                </div>
+                                <input type="range" id="input-max_word_inv_exp" min="0" max="30" step="0.5" value="9.6" class="neon-slider">
+                            </div>
+                            <div class="slider-control">
+                                <div class="slider-label">
+                                    <span>Крутизна экспоненты</span>
+                                    <span class="slider-value" id="val-exp_coef">5.0</span>
+                                </div>
+                                <input type="range" id="input-exp_coef" min="1.0" max="10.0" step="0.5" value="5.0" class="neon-slider">
+                            </div>
+                            <div class="checkbox-group mt-3">
+                                <span>Активные типы изгибов:</span>
+                                <label class="checkbox-control">
+                                    <input type="checkbox" id="chk-arc" checked value="arc"> Дуговой (синус)
+                                </label>
+                                <label class="checkbox-control">
+                                    <input type="checkbox" id="chk-exp" checked value="exp"> Экспоненциальный
+                                </label>
+                                <label class="checkbox-control">
+                                    <input type="checkbox" id="chk-inv_exp" checked value="inv_exp"> Обратный эксп.
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Правая панель: интерактивный предпросмотр -->
+            <section class="preview-area">
+                <div class="preview-header glass-panel">
+                    <div class="preview-nav">
+                        <button id="btn-prev-page" class="btn btn-icon">◀</button>
+                        <span id="page-indicator">Страница 1 / 1</span>
+                        <button id="btn-next-page" class="btn btn-icon">▶</button>
+                    </div>
+                    <div class="view-mode-selector">
+                        <button id="btn-mode-single" class="btn btn-tab active">📄 Один лист</button>
+                        <button id="btn-mode-multi" class="btn btn-tab">📚 Галерея</button>
+                    </div>
+                    <div class="zoom-controls">
+                        <button id="btn-zoom-out" class="btn btn-icon">-</button>
+                        <span id="zoom-indicator">100%</span>
+                        <button id="btn-zoom-in" class="btn btn-icon">+</button>
+                    </div>
+                </div>
+
+                <!-- Контейнер для рендеринга страниц -->
+                <div class="preview-viewport" id="preview-viewport">
+                    <div class="preview-container single-layout" id="preview-container">
+                        <!-- Сюда вставляются листы -->
+                        <div class="paper-sheet" id="preview-sheet">
+                            <div class="loading-overlay" id="loading-spinner">
+                                <div class="spinner"></div>
+                                <span class="loading-text">Рендеринг страницы...</span>
+                            </div>
+                            <div class="preview-empty" id="preview-empty">
+                                <div class="preview-empty-icon">✍️</div>
+                                <div class="preview-empty-title">Здесь появится ваш конспект</div>
+                                <div class="preview-empty-text">Загрузите документ во вкладке «Файлы» —<br>DOCX, LaTeX, Markdown или TXT</div>
+                            </div>
+                            <img id="preview-img" alt="Предпросмотр страницы" style="display:none">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Модальное окно для сохранения пресета -->
+    <div class="modal" id="modal-preset">
+        <div class="modal-content glass-panel">
+            <h3>Сохранить новый пресет</h3>
+            <div class="field-control mt-3">
+                <label for="input-preset-name">Название пресета:</label>
+                <input type="text" id="input-preset-name" placeholder="Мой пресет" class="neon-input">
+            </div>
+            <div class="modal-actions mt-4">
+                <button id="btn-modal-cancel" class="btn btn-secondary">Отмена</button>
+                <button id="btn-modal-save" class="btn btn-primary">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления (Toasts) -->
+    <!-- Экспорт в PDF: прогресс -->
+    <div class="export-overlay" id="export-overlay" style="display:none">
+        <div class="export-card">
+            <div class="spinner"></div>
+            <h3>Создаём PDF…</h3>
+            <p id="export-status">Готовим страницы…</p>
+            <div class="load-progress"><div id="export-progress-bar" class="load-progress-bar"></div></div>
+            <button id="btn-export-cancel" class="btn btn-secondary mt-2">Отменить</button>
+        </div>
+    </div>
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Подключаем логику JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>
