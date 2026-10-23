@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shrift — рукописный конспект из любого документа</title>
+    <meta name="description" content="Загрузите лекцию из Word, LaTeX или текстового файла: Shrift перепишет её вашим почерком на листе в клетку и соберёт PDF для печати. Работает в браузере, документы остаются у вас.">
+    <meta property="og:title" content="Shrift — рукописный конспект из любого документа">
+    <meta property="og:description" content="Текст и формулы вашим почерком на листе в клетку. PDF для печати.">
+    <meta property="og:image" content="https://shrift.pages.dev/img/ex-lecture.webp">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;600&family=Fira+Code:wght@400&display=swap">
+    <link rel="stylesheet" href="landing.css">
+    <script src="js/theme.js"></script>
+</head>
+<body>
+<div class="wrap">
+    <header class="top">
+        <a class="logo" href="#home"><i></i>Shrift</a>
+        <nav class="tabs" aria-label="Разделы">
+            <a href="#home">Главная</a><a href="#how">Как это работает</a><a href="#pricing">Тарифы</a><a href="#faq">Вопросы</a>
+        </nav>
+        <div class="hdr-right">
+            <button class="theme-toggle" type="button" data-theme-toggle title="Тёмная или светлая тема" aria-label="Сменить тему"></button>
+            <a class="btn primary" href="app.html">Попробовать</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- ГЛАВНАЯ -->
+        <section class="view" id="v-home">
+            <div class="hero">
+                <div>
+                    <h1>Конспект, который выглядит <em>написанным от руки</em></h1>
+                    <p class="lead">Загрузите лекцию из Word, LaTeX или текстового файла. Shrift перепишет её вашим почерком на листе в клетку и соберёт PDF для печати.</p>
+                    <div class="cta">
+                        <a class="btn primary big" href="app.html">Попробовать</a>
+                        <a class="btn big" href="#how">Как это работает</a>
+                    </div>
+                    <p class="fine">Работает в браузере. Документы остаются на вашем компьютере.</p>
+                </div>
+                <figure>
+                    <img class="shot" src="img/ex-lecture.webp" width="1400" height="676" alt="Страница конспекта в клетку: заголовок «Лекция 4. Производная», абзац текста и формула предела, написанные от руки синей ручкой">
+                    <figcaption>Страница, которую Shrift собрал из обычного текста с формулами.</figcaption>
+                </figure>
+            </div>
+
+            <div class="section">
+                <h2>Что получается</h2>
+                <p>Над каждой страницей исходный текст, под ним результат. Все картинки на этом сайте сделаны самим Shrift.</p>
+                <div class="examples">
+                    <div class="ex">
+                        <div class="src"><b>$$</b>\sum_{i=1}^{n} i^2 = \frac{n(n+1)(2n+1)}{6}<b>$$</b>
+<b>$$</b>\int_0^1 x^2\,dx = \frac{1}{3}<b>$$</b>
+<b>$$</b>x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}<b>$$</b>
+<b>$$</b>A = \begin{pmatrix} a &amp; b \\ c &amp; d \end{pmatrix}<b>$$</b></div>
+                        <figure>
+                            <img class="shot" src="img/ex-formulas.webp" width="1400" height="979" loading="lazy" alt="Страница в клетку с написанными от руки формулами: сумма квадратов, интеграл, формула корней квадратного уравнения и матрица" style="height:auto">
+                            <figcaption>Формулы: суммы, интегралы, дроби, корни, матрицы.</figcaption>
+                        </figure>
+                    </div>
+                    <div class="ex">
+                        <div class="src">Путь при равноускоренном движении:
+<b>$</b>s = v_0 t + \frac{a t^2}{2}<b>$</b>, скорость: <b>$</b>v = v_0 + at<b>$</b>.
+Если <b>$</b>v_0 = 2<b>$</b> м/с, <b>$</b>a = 3<b>$</b> м/с<b>$</b>^2<b>$</b>, то ...</div>
+                        <figure>
+                            <img class="shot" src="img/ex-physics.webp" width="1400" height="485" loading="lazy" alt="Страница в клетку: заголовок «Физика. Движение» и абзацы текста с формулами пути и скорости, написанные от руки" style="height:auto">
+                            <figcaption>Обычный текст с формулами внутри строк.</figcaption>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Почему это не похоже на печатный текст</h2>
+                <div class="cards">
+                    <div class="card"><h3>Ваш почерк</h3><p>Заполните бланк, сфотографируйте его, и Shrift соберёт шрифт из ваших букв. Можно взять и готовый шрифт или принести свой.</p></div>
+                    <div class="card"><h3>Живая бумага</h3><p>У каждой буквы несколько вариантов, строки слегка гуляют, нажим и наклон меняются. Страница не выглядит как копия.</p></div>
+                    <div class="card"><h3>Формулы как в тетради</h3><p>Дроби стоят в два этажа, индексы и степени на своих местах, а скобки растут вместе с содержимым.</p></div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Шрифт из вашего почерка</h2>
+                <div class="split">
+                    <div>
+                        <p>Распечатайте бланк, напишите в клетках по одному символу, сфотографируйте оба листа. Через несколько секунд шрифт готов, его можно сразу применить к конспекту или скачать.</p>
+                        <p>Справа шрифт, собранный из фотографии живого, не самого аккуратного бланка: ручка была так себе.</p>
+                    </div>
+                    <figure>
+                        <img class="shot" src="img/ex-handwriting.webp" width="1400" height="575" loading="lazy" alt="Алфавит, цифры и знаки, распознанные из фотографии заполненного бланка и собранные в шрифт" style="height:auto">
+                    </figure>
+                </div>
+            </div>
+
+            <div class="band">
+                <h2>Попробуйте на своём конспекте</h2>
+                <a class="btn primary big" href="app.html">Открыть Shrift</a>
+            </div>
+        </section>
+
+        <!-- КАК ЭТО РАБОТАЕТ -->
+        <section class="view" id="v-how" hidden>
+            <h2>Как это работает</h2>
+            <div class="steps">
+                <div class="step"><b>1</b><div><h3>Загрузите документ</h3><p>Подойдёт DOCX, LaTeX, Markdown или обычный текст. Формулы можно записывать в LaTeX или вставлять из Word.</p></div></div>
+                <div class="step"><b>2</b><div><h3>Выберите почерк</h3><p>Возьмите готовый шрифт, принесите свой файл .ttf или создайте шрифт из своего почерка по бланку.</p>
+                    <figure><img class="shot" src="img/ex-handwriting.webp" width="1400" height="575" loading="lazy" alt="Шрифт, собранный из фотографии бланка" style="height:auto"></figure></div></div>
+                <div class="step"><b>3</b><div><h3>Настройте лист</h3><p>Клетка или линейка, поля, размер букв, наклон, нажим, небрежность строк. Страница меняется сразу.</p>
+                    <figure><img class="shot" src="img/ex-physics.webp" width="1400" height="485" loading="lazy" alt="Готовая страница конспекта по физике" style="height:auto"></figure></div></div>
+                <div class="step"><b>4</b><div><h3>Скачайте PDF</h3><p>Готовый конспект уходит на печать без правок.</p></div></div>
+            </div>
+            <div class="cta"><a class="btn primary big" href="app.html">Попробовать</a></div>
+        </section>
+
+        <!-- ТАРИФЫ -->
+        <section class="view" id="v-pricing" hidden>
+            <h2>Тарифы</h2>
+            <p class="lead">Сейчас Shrift бесплатный. Мы готовим аккаунты и подписку, о цене и составе сообщим заранее.</p>
+            <div class="plans">
+                <div class="plan">
+                    <span class="tag">Сейчас</span>
+                    <h3>Бесплатный</h3>
+                    <div class="price">0 ₽</div>
+                    <ul><li>Загрузка DOCX, LaTeX, Markdown, TXT</li><li>Свой шрифт файлом .ttf</li><li>Шрифт из вашего почерка по бланку</li><li>Экспорт в PDF</li></ul>
+                    <a class="btn primary" href="app.html">Начать</a>
+                </div>
+                <div class="plan soon">
+                    <span class="tag">Скоро</span>
+                    <h3>Про</h3>
+                    <div class="price">Готовим</div>
+                    <ul><li>Аккаунт и вход по почте</li><li>Сохранение шрифтов и настроек в облаке</li><li>Выбор цветовой темы в профиле</li></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВОПРОСЫ -->
+        <section class="view" id="v-faq" hidden>
+            <h2>Вопросы</h2>
+            <div class="faq">
+                <details><summary>Мои документы куда-то отправляются?</summary><p>Нет. Текст обрабатывается в вашем браузере, документы никуда не загружаются.</p></details>
+                <details><summary>Нужен ли интернет?</summary><p>Да. Сайт проверяет связь при запуске и без интернета не откроется. Первый запуск скачивает движок (около 44 МБ), дальше он берётся из кэша браузера и открывается быстро.</p></details>
+                <details><summary>Какие форматы поддерживаются?</summary><p>DOCX, LaTeX, Markdown и обычный текст.</p></details>
+                <details><summary>Какие формулы получаются?</summary><p>Дроби, степени и индексы, суммы, интегралы, пределы, корни, матрицы и системы уравнений.</p></details>
+                <details><summary>Можно ли использовать другой шрифт?</summary><p>Да, загрузите файл .ttf. Лицензия на шрифт остаётся за вами: Shrift его не хранит и не раздаёт. В приложении есть список рекомендуемых шрифтов со ссылками на авторов.</p></details>
+                <details><summary>Как сделать шрифт из своего почерка?</summary><p>Скачайте бланк в приложении, распечатайте, заполните по одному символу в клетке и сфотографируйте оба листа. Всё остальное сделает Shrift.</p></details>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <span>Shrift — рукописный конспект из любого документа</span>
+        <a href="app.html">Открыть приложение</a>
+    </footer>
+</div>
+<script src="landing.js"></script>
+</body>
+</html>

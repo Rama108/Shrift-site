@@ -1,0 +1,109 @@
+{
+    "lectures_blue": {
+        "name": "Конспект лекций (Синий)",
+        "settings": {
+            "page_w": 2480,
+            "page_h": 3508,
+            "grid_size": 60,
+            "base_margin": 15,
+            "spine_cells": 3,
+            "global_y_shift": 0,
+            "right_padding": 110,
+            "paper_type": "grid",
+            "paper_color": "#ffffff",
+            "font_size": 80,
+            "pen_color": "#0000d5",
+            "line_jit": 55,
+            "word_vert_min": -4,
+            "word_vert_max": 2,
+            "max_word_arc": 12.0,
+            "max_word_exp": 9.6,
+            "max_word_inv_exp": 9.6,
+            "exp_coef": 5.0,
+            "word_curve_types": [
+                "arc",
+                "exp",
+                "inv_exp"
+            ],
+            "index_scale": 0.6,
+            "subscript_offset_ratio": 0.35,
+            "superscript_offset_ratio": 0.5,
+            "bold_stroke_width": 1,
+            "italic_shear_factor": -0.15,
+            "variant_count": 100,
+            "key_shift": 22,
+            "line_spacing_cells": 2
+        }
+    },
+    "art_black": {
+        "name": "Творческое письмо (Черная гелевая ручка)",
+        "settings": {
+            "page_w": 2480,
+            "page_h": 3508,
+            "grid_size": 60,
+            "base_margin": 30,
+            "spine_cells": 0,
+            "global_y_shift": 0,
+            "right_padding": 80,
+            "paper_type": "blank",
+            "paper_color": "#fdfbf7",
+            "font_size": 95,
+            "pen_color": "#111111",
+            "line_jit": 40,
+            "word_vert_min": -3,
+            "word_vert_max": 3,
+            "max_word_arc": 15.0,
+            "max_word_exp": 11.0,
+            "max_word_inv_exp": 11.0,
+            "exp_coef": 4.5,
+            "word_curve_types": [
+                "arc",
+                "exp"
+            ],
+            "index_scale": 0.55,
+            "subscript_offset_ratio": 0.4,
+            "superscript_offset_ratio": 0.45,
+            "bold_stroke_width": 2,
+            "italic_shear_factor": -0.1,
+            "variant_count": 100,
+            "key_shift": 25,
+            "line_spacing_cells": 2
+        }
+    },
+    "math_ruled": {
+        "name": "Математический черновик (Фиолетовый)",
+        "settings": {
+            "page_w": 2480,
+            "page_h": 3508,
+            "grid_size": 50,
+            "base_margin": 20,
+            "spine_cells": 2,
+            "global_y_shift": 0,
+            "right_padding": 90,
+            "paper_type": "ruled",
+            "paper_color": "#f8f9fa",
+            "font_size": 65,
+            "pen_color": "#7a0099",
+            "line_jit": 45,
+            "word_vert_min": -2,
+            "word_vert_max": 2,
+            "max_word_arc": 8.0,
+            "max_word_exp": 6.0,
+            "max_word_inv_exp": 6.0,
+            "exp_coef": 5.0,
+            "word_curve_types": [
+                "arc",
+                "exp",
+                "inv_exp"
+            ],
+            "index_scale": 0.65,
+            "subscript_offset_ratio": 0.3,
+            "superscript_offset_ratio": 0.5,
+            "bold_stroke_width": 1,
+            "italic_shear_factor": -0.18,
+            "variant_count": 100,
+            "key_shift": 18,
+            "line_spacing_cells": 2
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Shrift",
+  "version": "1.0",
+  "description": "Автономный генератор рукописного текста из DOCX",
+  "action": {
+    "default_title": "Открыть Shrift"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "downloads"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
